@@ -88,26 +88,27 @@ File.open(filename, "w+") { |f| f.write Time.now.utc }
 
 commit_changes = `#{git} log --abbrev-commit --oneline --since='#{revtime}' --reverse`
 unless commit_changes.empty?
-  message = "Commits just pushed to "
+  committed_by = `#{git} log --format=%an -n 1`
+  message = 'Commits just pushed to '
   if repo_url
     message += "<a href=\"#{repo_url}\">"
   end
   message += repository
   if repo_url
-    message += "</a>"
+    message += '</a>'
   end
-  message += ":<br/>"
+  message += " by #{committed_by.strip}:<br />"
 
   commit_changes.split("\n").each do |commit|
     if commit.strip =~ /^([\da-z]+) (.*)/
       if commit_url
         message += "<a href=\"#{commit_url + $1}\">"
       end
-      message += $1
+      message += "#{$1} "
       if commit_url
-        message += "</a>"
+        message += '</a>'
       end
-      message += " #{$2.split("\n").first}<br/>"
+      message += "#{$2.split("\n").first}<br />"
     end
   end
   speak message
